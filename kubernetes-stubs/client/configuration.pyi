@@ -29,7 +29,6 @@ class Configuration(object):
     safe_chars_for_path_param: str = ""
     retries: int
     client_side_validation: bool = True
-
     def __init__(
         self,
         host: str = ...,
