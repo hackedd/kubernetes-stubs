@@ -83,7 +83,7 @@ def make_type_name(
                 else:
                     return "typing.Any"
             else:
-                assert "unknown type"
+                raise Exception("unknown type")
 
         ref = config.get("$ref") or config["schema"]["$ref"]
         assert ref.startswith("#/definitions/")
@@ -178,8 +178,8 @@ for name, config in schema["definitions"].items():
     for prop in props:
         buf.writeln(str(prop))
     buf.writeln()
-    params = ", ".join(prop.param_str() for prop in props)
-    buf.start_block(f"def __init__(self, *, {params}) -> None")
+    init_params = ", ".join(prop.param_str() for prop in props)
+    buf.start_block(f"def __init__(self, *, {init_params}) -> None")
     buf.writeln("...")
     buf.end_block()
     buf.start_block(f"def to_dict(self) -> {class_name}Dict")
@@ -230,17 +230,24 @@ for name, api in apis.items():
     buf.end_block()
     for op in api:
         name = inflection.underscore(op["operationId"])
-        responses = op["responses"]
-        if "200" in responses:
-            return_ty = make_type_name(responses["200"]["schema"], is_optional=False)
-        else:
+        success_responses = {
+            make_type_name(response["schema"], is_optional=False)
+            for status, response in op["responses"].items()
+            if status.startswith("2")
+        }
+
+        if not success_responses:
             return_ty = "None"
+        elif len(success_responses) == 1:
+            return_ty = success_responses.pop()
+        else:
+            return_ty = f"typing.Union[{', '.join(sorted(success_responses))}]"
         params: list[Property] = []
         for param in op.get("parameters", []):
             is_optional = not param.get("required", False)
             param_name = param["name"]
             i = 2
-            while any(param.name == param_name for param in params):
+            while any(p.name == param_name for p in params):
                 param_name = param["name"] + str(i)
                 i += 1
             params.append(
