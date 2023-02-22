@@ -42,14 +42,14 @@ class DynamicClient:
         name: str | None = ...,
         namespace: str | None = ...,
         **kwargs
-    ): ...
+    ) -> ResourceInstance: ...
     def create(
         self,
         resource: Resource,
         body: Body = ...,
         namespace: str | None = ...,
         **kwargs
-    ): ...
+    ) -> ResourceInstance: ...
     def delete(
         self,
         resource: Resource,
@@ -59,7 +59,7 @@ class DynamicClient:
         label_selector: Incomplete | None = ...,
         field_selector: Incomplete | None = ...,
         **kwargs
-    ): ...
+    ) -> ResourceInstance: ...
     def replace(
         self,
         resource: Resource,
@@ -67,7 +67,7 @@ class DynamicClient:
         name: str | None = ...,
         namespace: str | None = ...,
         **kwargs
-    ): ...
+    ) -> ResourceInstance: ...
     def patch(
         self,
         resource: Resource,
@@ -75,7 +75,7 @@ class DynamicClient:
         name: str | None = ...,
         namespace: str | None = ...,
         **kwargs
-    ): ...
+    ) -> ResourceInstance: ...
     def server_side_apply(
         self,
         resource: Resource,
@@ -84,7 +84,7 @@ class DynamicClient:
         namespace: str | None = ...,
         force_conflicts: Incomplete | None = ...,
         **kwargs
-    ): ...
+    ) -> ResourceInstance: ...
     def watch(
         self,
         resource: Resource,

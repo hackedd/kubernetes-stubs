@@ -17,7 +17,7 @@ class Resource:
     verbs: Incomplete
     name: Optional[str]
     preferred: Incomplete
-    client: Incomplete
+    client: DynamicClient
     singular_name: Optional[str]
     short_names: Incomplete
     categories: Incomplete
@@ -33,7 +33,7 @@ class Resource:
         verbs: Incomplete | None = ...,
         name: str | None = ...,
         preferred: bool = ...,
-        client: Incomplete | None = ...,
+        client: DynamicClient | None = ...,
         singularName: str | None = ...,
         shortNames: Incomplete | None = ...,
         categories: Incomplete | None = ...,
@@ -48,6 +48,61 @@ class Resource:
     def path(self, name: Optional[str] = ..., namespace: Optional[str] = ...): ...
     # def __getattr__(self, name: str): ...
 
+    # These methods are magically forwarded by  __getattr__ to the client
+    def get(
+        self,
+        name: str | None = ...,
+        namespace: str | None = ...,
+        **kwargs
+    ) -> ResourceInstance: ...
+    def create(
+        self,
+        body: Body = ...,
+        namespace: str | None = ...,
+        **kwargs
+    ) -> ResourceInstance: ...
+    def delete(
+        self,
+        name: str | None = ...,
+        namespace: str | None = ...,
+        body: Body = ...,
+        label_selector: Incomplete | None = ...,
+        field_selector: Incomplete | None = ...,
+        **kwargs
+    ) -> ResourceInstance: ...
+    def replace(
+        self,
+        body: Body = ...,
+        name: str | None = ...,
+        namespace: str | None = ...,
+        **kwargs
+    ) -> ResourceInstance: ...
+    def patch(
+        self,
+        body: Body = ...,
+        name: str | None = ...,
+        namespace: str | None = ...,
+        **kwargs
+    ) -> ResourceInstance: ...
+    def server_side_apply(
+        self,
+        body: Body = ...,
+        name: str | None = ...,
+        namespace: str | None = ...,
+        force_conflicts: Incomplete | None = ...,
+        **kwargs
+    ) -> ResourceInstance: ...
+    def watch(
+        self,
+        namespace: str | None = ...,
+        name: str | None = ...,
+        label_selector: Incomplete | None = ...,
+        field_selector: Incomplete | None = ...,
+        resource_version: str | None = ...,
+        timeout: int | None = ...,
+        watcher: Watch | None = ...,
+    ) -> Generator[Event, None, None]: ...
+
 class ResourceList(Resource):
     base_kind: Optional[str]
     base_resource_lookup: Incomplete
@@ -57,30 +112,11 @@ class ResourceList(Resource):
         group: str = ...,
         api_version: str = ...,
         base_kind: str = ...,
-        kind: Incomplete | None = ...,
+        kind: str | None = ...,
         base_resource_lookup: Incomplete | None = ...,
     ) -> None: ...
     def base_resource(self) -> Resource | None: ...
-    def get(
-        self,
-        body,
-        name: Incomplete | None = ...,
-        namespace: Incomplete | None = ...,
-        **kwargs
-    ) -> ResourceInstance: ...
-    def delete(
-        self,
-        body,
-        name: Incomplete | None = ...,
-        namespace: Incomplete | None = ...,
-        **kwargs
-    ) -> ResourceInstance: ...
     def verb_mapper(self, verb, body, **kwargs) -> ResourceInstance: ...
-    def create(self, *args, **kwargs) -> ResourceInstance: ...
-    def replace(self, *args, **kwargs) -> ResourceInstance: ...
-    def patch(self, *args, **kwargs) -> ResourceInstance: ...
-    def to_dict(self) -> dict: ...
-    # def __getattr__(self, name): ...
 
 class SubresourceUrls(TypedDict):
     full: str
@@ -88,21 +124,13 @@ class SubresourceUrls(TypedDict):
 
 class Subresource(Resource):
     parent: Incomplete
-    prefix: Incomplete
-    group: Incomplete
-    api_version: Incomplete
-    kind: Incomplete
-    name: Incomplete
     subresource: Incomplete
-    namespaced: Incomplete
-    verbs: Incomplete
-    extra_args: Incomplete
     def __init__(self, parent, **kwargs) -> None: ...
     def create(
         self,
-        body: Incomplete | None = ...,
-        name: Incomplete | None = ...,
-        namespace: Incomplete | None = ...,
+        body: Body = ...,
+        name: str | None = ...,
+        namespace: str | None = ...,
         **kwargs
     ): ...
     @property
